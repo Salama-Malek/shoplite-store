@@ -1,12 +1,14 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useReducer,
-  ReactNode,
+  type ReactNode,
 } from 'react';
 import type { Product } from '../data/products';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export type CartItem = {
   id: number;
@@ -16,28 +18,32 @@ export type CartItem = {
   quantity: number;
 };
 
+const TAX_RATE = 0.0825;
+const STORAGE_KEY = 'shoplite-cart';
+const MAX_QUANTITY = 99;
+
 type CartState = {
   items: CartItem[];
 };
 
 type CartAction =
+  | { type: 'HYDRATE'; payload: CartItem[] }
   | { type: 'ADD_ITEM'; payload: Product }
   | { type: 'REMOVE_ITEM'; payload: { id: number } }
   | { type: 'UPDATE_QUANTITY'; payload: { id: number; quantity: number } }
-  | { type: 'RESET' }
-  | { type: 'HYDRATE'; payload: CartItem[] };
-
-const STORAGE_KEY = 'shoplite-cart';
+  | { type: 'RESET' };
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
+    case 'HYDRATE':
+      return { items: action.payload };
     case 'ADD_ITEM': {
       const existing = state.items.find((item) => item.id === action.payload.id);
       if (existing) {
         return {
           items: state.items.map((item) =>
             item.id === action.payload.id
-              ? { ...item, quantity: Math.min(item.quantity + 1, 9) }
+              ? { ...item, quantity: Math.min(item.quantity + 1, MAX_QUANTITY) }
               : item
           ),
         };
@@ -55,30 +61,18 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         ],
       };
     }
-    case 'REMOVE_ITEM': {
+    case 'REMOVE_ITEM':
       return { items: state.items.filter((item) => item.id !== action.payload.id) };
-    }
     case 'UPDATE_QUANTITY': {
+      const quantity = Math.min(Math.max(1, action.payload.quantity), MAX_QUANTITY);
       return {
-        items: state.items
-          .map((item) => {
-            if (item.id !== action.payload.id) return item;
-            const nextQuantity = Math.max(0, Math.min(action.payload.quantity, 9));
-            return { ...item, quantity: nextQuantity };
-          })
-          .filter((item) => item.quantity > 0),
+        items: state.items.map((item) =>
+          item.id === action.payload.id ? { ...item, quantity } : item
+        ),
       };
     }
-    case 'RESET': {
+    case 'RESET':
       return { items: [] };
-    }
-    case 'HYDRATE': {
-      return {
-        items: action.payload
-          .filter((item) => item.quantity > 0)
-          .map((item) => ({ ...item, quantity: Math.min(item.quantity, 9) })),
-      };
-    }
     default:
       return state;
   }
@@ -87,7 +81,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 type CartContextValue = {
   items: CartItem[];
   totalItems: number;
-  totalPrice: number;
+  subtotal: number;
+  tax: number;
+  total: number;
   addToCart: (product: Product) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
@@ -97,44 +93,43 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, { items: [] });
+  const [storedItems, setStoredItems] = useLocalStorage<CartItem[]>(STORAGE_KEY, []);
+  const [state, dispatch] = useReducer(cartReducer, { items: storedItems });
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed: CartItem[] = JSON.parse(stored);
-        dispatch({ type: 'HYDRATE', payload: parsed });
-      } catch (error) {
-        console.error('Failed to parse cart data', error);
-      }
-    }
-  }, []);
+    dispatch({ type: 'HYDRATE', payload: storedItems });
+  }, [storedItems]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-  }, [state.items]);
+    setStoredItems(state.items);
+  }, [state.items, setStoredItems]);
+
+  const addToCart = useCallback((product: Product) => dispatch({ type: 'ADD_ITEM', payload: product }), []);
+  const removeFromCart = useCallback((id: number) => dispatch({ type: 'REMOVE_ITEM', payload: { id } }), []);
+  const updateQuantity = useCallback(
+    (id: number, quantity: number) => dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } }),
+    []
+  );
+  const resetCart = useCallback(() => dispatch({ type: 'RESET' }), []);
 
   const value = useMemo(() => {
-    const totalItems = state.items.reduce((acc, item) => acc + item.quantity, 0);
-    const totalPrice = state.items.reduce(
-      (acc, item) => acc + item.quantity * item.price,
-      0
-    );
+    const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const tax = subtotal * TAX_RATE;
+    const total = subtotal + tax;
+    const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
     return {
       items: state.items,
+      subtotal,
+      tax,
+      total,
       totalItems,
-      totalPrice,
-      addToCart: (product: Product) => dispatch({ type: 'ADD_ITEM', payload: product }),
-      removeFromCart: (id: number) => dispatch({ type: 'REMOVE_ITEM', payload: { id } }),
-      updateQuantity: (id: number, quantity: number) =>
-        dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } }),
-      resetCart: () => dispatch({ type: 'RESET' }),
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      resetCart,
     };
-  }, [state.items]);
+  }, [state.items, addToCart, removeFromCart, updateQuantity, resetCart]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
