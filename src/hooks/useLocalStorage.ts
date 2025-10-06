@@ -1,24 +1,29 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const isBrowser = typeof window !== 'undefined';
 
 export const useLocalStorage = <T,>(key: string, initialValue: T) => {
+  const fallbackRef = useRef(initialValue);
+
+  useEffect(() => {
+    fallbackRef.current = initialValue;
+  }, [initialValue]);
+
   const readValue = useCallback((): T => {
-    if (!isBrowser) return initialValue;
+    if (!isBrowser) return fallbackRef.current;
     try {
       const item = window.localStorage.getItem(key);
-      return item ? (JSON.parse(item) as T) : initialValue;
+      return item ? (JSON.parse(item) as T) : fallbackRef.current;
     } catch (error) {
       console.warn(`useLocalStorage: failed reading key "${key}"`, error);
-      return initialValue;
+      return fallbackRef.current;
     }
-  }, [initialValue, key]);
+  }, [key]);
 
   const [storedValue, setStoredValue] = useState<T>(readValue);
 
   useEffect(() => {
     setStoredValue(readValue());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readValue]);
 
   const setValue = useCallback(

@@ -2,6 +2,7 @@ import { Suspense, lazy, useState } from 'react';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import CartDrawer from './components/shop/CartDrawer';
+import BackToTopButton from './components/common/BackToTopButton';
 
 const Home = lazy(() => import('./pages/Home'));
 
@@ -23,6 +24,7 @@ const App = () => {
         </Suspense>
       </main>
       <Footer />
+      <BackToTopButton />
       <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
