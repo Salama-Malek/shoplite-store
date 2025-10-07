@@ -1,5 +1,6 @@
 import { memo, useCallback, type MouseEvent } from 'react';
 import { motion } from 'framer-motion';
+import { StarIcon } from '@heroicons/react/24/solid';
 import type { Product } from '../../data/products';
 import { useCart } from '../../context/CartContext';
 import WishlistButton from './WishlistButton';
@@ -35,11 +36,18 @@ const ProductCardComponent = ({ product, onView }: ProductCardProps) => {
           className="h-56 w-full rounded-2xl object-cover transition duration-500 group-hover:scale-105"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/0" />
-        <div className="absolute left-4 top-4 flex items-center gap-2">
+        <div className="absolute left-0 top-0 flex w-full items-start justify-between p-4">
           <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-medium uppercase tracking-wide text-slate-100">
             {product.category}
           </span>
-          <WishlistButton productId={product.id} size="sm" />
+          <div className="flex items-center gap-2">
+            {product.discount && (
+              <span className="rounded-full bg-rose-500/90 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wide text-white shadow-lg shadow-rose-500/30">
+                Save {product.discount}%
+              </span>
+            )}
+            <WishlistButton productId={product.id} size="sm" />
+          </div>
         </div>
       </div>
       <div className="mt-6 flex flex-1 flex-col gap-4">
@@ -47,8 +55,16 @@ const ProductCardComponent = ({ product, onView }: ProductCardProps) => {
           <h3 className="text-lg font-semibold text-white">{product.name}</h3>
           <p className="line-clamp-2 text-sm text-slate-400">{product.description}</p>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-accent">${product.price.toFixed(2)}</span>
+        <div className="flex items-end justify-between gap-4">
+          <div className="space-y-1">
+            <span className="text-2xl font-bold text-accent">${product.price.toFixed(2)}</span>
+            {product.rating && (
+              <div className="flex items-center gap-1 text-xs font-medium text-amber-300">
+                <StarIcon className="h-4 w-4" aria-hidden="true" />
+                <span>{product.rating.toFixed(1)}</span>
+              </div>
+            )}
+          </div>
           <motion.button
             type="button"
             whileTap={{ scale: 0.97 }}

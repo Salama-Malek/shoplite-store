@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const WISHLIST_KEY = 'shoplite-wishlist';
-const RECENT_KEY = 'shoplite-recently-viewed';
+const RECENT_KEY = 'shoplite-recent';
 const RECENT_LIMIT = 8;
 
 export type PreferencesContextValue = {

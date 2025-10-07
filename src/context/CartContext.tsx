@@ -18,7 +18,7 @@ export type CartItem = {
   quantity: number;
 };
 
-const TAX_RATE = 0.0825;
+const TAX_RATE = 0.08;
 const STORAGE_KEY = 'shoplite-cart';
 const MAX_QUANTITY = 99;
 
