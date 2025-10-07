@@ -5,9 +5,11 @@ import { usePreferences } from '../../context/PreferencesContext';
 
 type HeaderProps = {
   onCartToggle: () => void;
+  onNavigate: (page: 'home' | 'wishlist') => void;
+  activePage: 'home' | 'wishlist';
 };
 
-const Header = ({ onCartToggle }: HeaderProps) => {
+const Header = ({ onCartToggle, onNavigate, activePage }: HeaderProps) => {
   const { totalItems, total } = useCart();
   const { wishlist } = usePreferences();
 
@@ -19,19 +21,51 @@ const Header = ({ onCartToggle }: HeaderProps) => {
       className="sticky top-0 z-30 border-b border-white/10 bg-gradient-to-b from-surface/80 via-surface/60 to-surface/40 backdrop-blur"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <motion.h1 layout className="text-3xl font-semibold tracking-tight text-white">
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => onNavigate('home')}
+            className="text-left text-3xl font-semibold tracking-tight text-white transition hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+          >
             ShopLite Store
-          </motion.h1>
+          </button>
           <p className="text-sm text-slate-400">
             Elevated essentials, thoughtful design, and tech-forward accessories curated for your every day.
           </p>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.96 }}
+              onClick={() => onNavigate('home')}
+              aria-pressed={activePage === 'home'}
+              className={`inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                activePage === 'home'
+                  ? 'bg-accent/90 text-slate-900 shadow-glow'
+                  : 'bg-background/60 text-slate-300 hover:border-accent/60 hover:text-accent'
+              }`}
+            >
+              Browse All
+            </motion.button>
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.96 }}
+              onClick={() => onNavigate('wishlist')}
+              aria-pressed={activePage === 'wishlist'}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                activePage === 'wishlist'
+                  ? 'border-rose-400/70 bg-rose-500/20 text-rose-100 shadow-lg shadow-rose-500/20'
+                  : 'border-white/10 bg-background/60 text-slate-300 hover:border-rose-400/60 hover:text-rose-200'
+              }`}
+            >
+              <HeartIcon className="h-4 w-4" aria-hidden="true" />
+              <span>Wishlist</span>
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.65rem] font-semibold text-slate-100">
+                {wishlist.length}
+              </span>
+            </motion.button>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-background/60 px-4 py-2 text-xs text-slate-300 shadow-inner shadow-black/20">
-            <HeartIcon className="h-4 w-4 text-accent" aria-hidden="true" />
-            <span>{wishlist.length} saved</span>
-          </div>
           <motion.button
             type="button"
             whileTap={{ scale: 0.97 }}
