@@ -18,6 +18,8 @@ export type SortOption = 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 type SortMenuProps = {
   value: SortOption;
   onChange: (value: SortOption) => void;
+  variant?: 'dropdown' | 'list';
+  className?: string;
 };
 
 const options: { label: string; value: SortOption }[] = [
@@ -27,7 +29,7 @@ const options: { label: string; value: SortOption }[] = [
   { label: 'Name: Z to A', value: 'name-desc' },
 ];
 
-const SortMenuComponent = ({ value, onChange }: SortMenuProps) => {
+const SortMenuComponent = ({ value, onChange, variant = 'dropdown', className }: SortMenuProps) => {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(
     Math.max(
@@ -48,7 +50,7 @@ const SortMenuComponent = ({ value, onChange }: SortMenuProps) => {
   );
 
   useEffect(() => {
-    if (!open) {
+    if (variant !== 'dropdown' || !open) {
       return;
     }
     const handlePointerDown = (event: PointerEvent) => {
@@ -59,10 +61,10 @@ const SortMenuComponent = ({ value, onChange }: SortMenuProps) => {
 
     window.addEventListener('pointerdown', handlePointerDown);
     return () => window.removeEventListener('pointerdown', handlePointerDown);
-  }, [open]);
+  }, [open, variant]);
 
   useEffect(() => {
-    if (!open) {
+    if (variant !== 'dropdown' || !open) {
       return;
     }
     const selectedIndex = options.findIndex((option) => option.value === value);
@@ -74,14 +76,16 @@ const SortMenuComponent = ({ value, onChange }: SortMenuProps) => {
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [open, value]);
+  }, [open, value, variant]);
 
   const toggleOpen = () => setOpen((prev) => !prev);
 
   const handleSelect = (option: SortOption) => {
     onChange(option);
-    setOpen(false);
-    triggerRef.current?.focus();
+    if (variant === 'dropdown') {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -111,6 +115,46 @@ const SortMenuComponent = ({ value, onChange }: SortMenuProps) => {
       triggerRef.current?.focus();
     }
   };
+
+  if (variant === 'list') {
+    return (
+      <div
+        className={`w-full rounded-3xl border border-white/10 bg-slate-900/70 p-4 text-slate-100 shadow-inner shadow-black/30 ${className ?? ''}`}
+      >
+        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+          <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/20 text-accent">
+            <ListBulletIcon className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <span>Sort by</span>
+        </div>
+        <div className="mt-4 space-y-2">
+          {options.map((option) => {
+            const isSelected = option.value === value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option.value)}
+                className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                  isSelected
+                    ? 'border-accent/60 bg-accent/20 text-accent'
+                    : 'border-white/10 bg-white/0 text-slate-200 hover:border-accent/40 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <span>{option.label}</span>
+                <CheckIcon
+                  className={`h-4 w-4 transition ${
+                    isSelected ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>

@@ -18,18 +18,7 @@ export type Product = {
   discount?: number;
 };
 
-export const products: Product[] = [
-  {
-    id: 1,
-    name: 'Nebula Wireless Headphones',
-    price: 149.99,
-    category: 'Tech',
-    image: 'https://images.unsplash.com/photo-1516110833967-5787bba5b0c7?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Immerse yourself in crystal-clear audio with active noise cancellation and a 30-hour battery life designed for travelers.',
-    rating: 4.8,
-    discount: 15,
-  },
+const rawProducts: Product[] = [
   {
     id: 2,
     name: 'Lumos Smart Lamp',
@@ -53,16 +42,6 @@ export const products: Product[] = [
     discount: 12,
   },
   {
-    id: 4,
-    name: 'Cascade Insulated Bottle',
-    price: 28.75,
-    category: 'Outdoor',
-    image: 'https://images.unsplash.com/photo-1526404079168-8a5b5a71373a?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Keeps drinks cold for 24 hours or hot for 12 with triple-layer insulation and a leak-proof spout.',
-    rating: 4.4,
-  },
-  {
     id: 5,
     name: 'Orbit Bluetooth Speaker',
     price: 74.99,
@@ -83,16 +62,6 @@ export const products: Product[] = [
       'Handcrafted Italian leather backpack with padded laptop sleeve and modular interior compartments.',
     rating: 4.7,
     discount: 20,
-  },
-  {
-    id: 7,
-    name: 'Aurora Knit Sweater',
-    price: 96.25,
-    category: 'Apparel',
-    image: 'https://images.unsplash.com/photo-1530023367847-a683933f4177?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Cozy merino wool sweater featuring a modern silhouette and ribbed cuffs, perfect for transitional weather.',
-    rating: 4.2,
   },
   {
     id: 8,
@@ -168,17 +137,6 @@ export const products: Product[] = [
       'Luxurious stonewashed linen bedding that becomes softer with every wash and regulates sleep temperature.',
     rating: 4.3,
     discount: 10,
-  },
-  {
-    id: 15,
-    name: 'Ember Cast Iron Skillet',
-    price: 94,
-    category: 'Home',
-    image: 'https://images.unsplash.com/photo-1514516430039-0b2378b87cc6?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Heavy-duty cast iron skillet seasoned for even heat retention and oven-to-table convenience.',
-    rating: 4.5,
-    discount: 14,
   },
   {
     id: 16,
@@ -284,36 +242,8 @@ export const products: Product[] = [
       'Soft-knit Bluetooth headband that plays soothing audio while tracking sleep and meditation sessions.',
     rating: 4.3,
   },
-  {
-    id: 26,
-    name: 'Voyager Packing Cubes',
-    price: 42,
-    category: 'Travel',
-    image: 'https://images.unsplash.com/photo-1542293787938-4d2226c44384?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Set of five compression packing cubes with mesh panels and double zippers to keep luggage organized.',
-    rating: 4.1,
-  },
-  {
-    id: 27,
-    name: 'Vitality Foam Roller',
-    price: 46,
-    category: 'Wellness',
-    image: 'https://images.unsplash.com/photo-1584466977773-e625c37cddc8?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'High-density foam roller with textured zones to release tension before and after workouts.',
-    rating: 4.5,
-  },
-  {
-    id: 28,
-    name: 'Coastal Breeze Candle',
-    price: 32,
-    category: 'Home',
-    image: 'https://images.unsplash.com/photo-1484889357754-1e85f666b078?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Hand-poured soy candle with driftwood, sea salt, and jasmine notes for a coastal escape at home.',
-    rating: 4.2,
-  },
+ 
+  
   {
     id: 29,
     name: 'Glide Travel Sneakers',
@@ -336,16 +266,7 @@ export const products: Product[] = [
     rating: 4.6,
     discount: 18,
   },
-  {
-    id: 31,
-    name: 'Serenity Herbal Tea Kit',
-    price: 44,
-    category: 'Wellness',
-    image: 'https://images.unsplash.com/photo-1485808191613-78220c61f6a4?auto=format&fit=crop&w=1000&q=80',
-    description:
-      'Curated herbal tea kit with loose-leaf blends, infuser, and tasting guide for mindful rituals.',
-    rating: 4.7,
-  },
+  
   {
     id: 32,
     name: 'Flux Wireless Charger',
@@ -359,6 +280,11 @@ export const products: Product[] = [
   },
 ];
 
+const hasProductImage = (product: Product) =>
+  typeof product.image === 'string' && product.image.trim().length > 0;
+
+export const products: Product[] = rawProducts.filter(hasProductImage);
+
 export const categories = [
   'All',
   'Accessories',
@@ -369,4 +295,3 @@ export const categories = [
   'Wellness',
   'Travel',
 ] as const;
-

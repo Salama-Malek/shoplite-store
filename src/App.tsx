@@ -3,6 +3,7 @@ import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import CartDrawer from './components/shop/CartDrawer';
 import BackToTopButton from './components/common/BackToTopButton';
+import { ToastViewport } from './context/ToastContext';
 
 const Home = lazy(() => import('./pages/Home'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
@@ -39,6 +40,7 @@ const App = () => {
       <Footer />
       <BackToTopButton />
       <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <ToastViewport />
     </div>
   );
 };

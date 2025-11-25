@@ -4,6 +4,7 @@ import { StarIcon } from '@heroicons/react/24/solid';
 import type { Product } from '../../data/products';
 import { useCart } from '../../context/CartContext';
 import WishlistButton from './WishlistButton';
+import { useToast } from '../../context/ToastContext';
 
 type ProductCardProps = {
   product: Product;
@@ -12,13 +13,15 @@ type ProductCardProps = {
 
 const ProductCardComponent = ({ product, onView }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { showToast } = useToast();
 
   const handleAddToCart = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
       addToCart(product);
+      showToast(`Added "${product.name}" to cart`);
     },
-    [addToCart, product]
+    [addToCart, product, showToast]
   );
 
   return (
