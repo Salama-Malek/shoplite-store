@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { HeartIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../../context/CartContext';
@@ -12,13 +13,31 @@ type HeaderProps = {
 const Header = ({ onCartToggle, onNavigate, activePage }: HeaderProps) => {
   const { totalItems, total } = useCart();
   const { wishlist } = usePreferences();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 12);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="sticky top-0 z-30 border-b border-white/10 bg-gradient-to-b from-surface/80 via-surface/60 to-surface/40 backdrop-blur"
+      className={`sticky top-0 z-30 border-b backdrop-blur-lg transition-all duration-300 ${
+        isScrolled
+          ? 'border-accent/25 bg-background/85 shadow-[0_18px_48px_rgba(8,12,24,0.55)]'
+          : 'border-white/10 bg-gradient-to-b from-surface/80 via-surface/60 to-surface/40 shadow-none'
+      }`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-3">

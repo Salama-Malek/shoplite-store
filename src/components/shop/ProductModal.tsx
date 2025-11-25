@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { Product } from '../../data/products';
 import { useCart } from '../../context/CartContext';
 import WishlistButton from './WishlistButton';
+import { useToast } from '../../context/ToastContext';
 
 type ProductModalProps = {
   product: Product | null;
@@ -15,6 +16,7 @@ type ProductModalProps = {
 
 const ProductModal = ({ product, open, onClose, onCartOpen }: ProductModalProps) => {
   const { addToCart } = useCart();
+  const { showToast } = useToast();
   const shouldRender = open && Boolean(product);
 
   return (
@@ -90,6 +92,7 @@ const ProductModal = ({ product, open, onClose, onCartOpen }: ProductModalProps)
                       whileTap={{ scale: 0.97 }}
                       onClick={() => {
                         addToCart(product);
+                        showToast(`Added "${product.name}" to cart`);
                         onCartOpen?.();
                         onClose();
                       }}

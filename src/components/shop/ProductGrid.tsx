@@ -9,9 +9,17 @@ interface ProductGridProps {
   onView: (product: Product) => void;
   onLoadMore: () => void;
   hasMore: boolean;
+  skeletonCount?: number;
 }
 
-const ProductGrid = ({ products, isLoading, onView, onLoadMore, hasMore }: ProductGridProps) => {
+const ProductGrid = ({
+  products,
+  isLoading,
+  onView,
+  onLoadMore,
+  hasMore,
+  skeletonCount = 9,
+}: ProductGridProps) => {
   return (
     <div className="space-y-12">
       <AnimatePresence mode="sync">
@@ -23,7 +31,7 @@ const ProductGrid = ({ products, isLoading, onView, onLoadMore, hasMore }: Produ
             exit={{ opacity: 0 }}
             className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3"
           >
-            {Array.from({ length: 6 }, (_, index) => (
+            {Array.from({ length: skeletonCount }, (_, index) => (
               <SkeletonCard key={index} />
             ))}
           </motion.div>
