@@ -4,6 +4,8 @@
 
 Live demo: https://salama-malek.github.io/shoplite-store/
 
+![Screenshot of the app](docs/screenshot.jpg)
+
 A fast, dark-themed React storefront demo for browsing, filtering, and buying a curated product catalog.
 
 ## Overview
