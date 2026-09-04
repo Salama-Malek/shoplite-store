@@ -1,5 +1,9 @@
 # ShopLite Store
 
+![Deploy](https://github.com/Salama-Malek/shoplite-store/actions/workflows/deploy.yml/badge.svg)
+
+Live demo: https://salama-malek.github.io/shoplite-store/
+
 A fast, dark-themed React storefront demo for browsing, filtering, and buying a curated product catalog.
 
 ## Overview
