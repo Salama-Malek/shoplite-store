@@ -92,3 +92,7 @@ src/
 ```
 
 Build configuration lives in `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, and `tsconfig.json`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
